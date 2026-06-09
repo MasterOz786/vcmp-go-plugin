@@ -37,7 +37,7 @@ func main() {}
 CGO_ENABLED=1 go build -buildmode=c-shared -o myplugin04rel64.so .
 ```
 
-Copy the `.so` next to your VC:MP server and add `plugins myplugin04rel64` to `server.cfg`.
+Copy the built `.so` or `.dll` into the VC:MP server's `plugins/` folder and add `plugins myplugin04rel64` to `server.cfg`.
 
 ## API surface
 
@@ -51,5 +51,5 @@ See [`examples/blank`](examples/blank) for a minimal plugin template.
 
 ```bash
 make build
-# or: cd examples/blank && CGO_ENABLED=1 go build -buildmode=c-shared -o ../../goplugin04rel64.so .
+# or: cd examples/blank && CGO_ENABLED=1 go build -buildmode=c-shared -o ../../plugins/goplugin04rel64.so .
 ```
