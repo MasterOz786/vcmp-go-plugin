@@ -1,17 +1,26 @@
-PLUGIN_NAME ?= goserver04rel64
+PLUGIN_NAME ?= goplugin04rel64
+HEADER := include/plugin.h
 
-# VC:MP server release tags: rel32, rel64, etc.
-# Build on the same OS/arch as your server (usually Linux x86_64 or Windows).
-.PHONY: build build-linux build-windows clean
+.PHONY: all deps build build-linux build-windows example clean
 
-build:
-	go build -buildmode=c-shared -o $(PLUGIN_NAME).so .
+all: build
 
-build-linux:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -buildmode=c-shared -o $(PLUGIN_NAME).so .
+deps:
+	cd scripts && go run fetch_plugin.go
 
-build-windows:
-	GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc go build -buildmode=c-shared -o $(PLUGIN_NAME).dll .
+$(HEADER):
+	$(MAKE) deps
+
+build: $(HEADER)
+	cd examples/blank && CGO_ENABLED=1 go build -buildmode=c-shared -o ../../$(PLUGIN_NAME).so .
+
+build-linux: $(HEADER)
+	cd examples/blank && GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -buildmode=c-shared -o ../../$(PLUGIN_NAME).so .
+
+build-windows: $(HEADER)
+	cd examples/blank && GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc go build -buildmode=c-shared -o ../../$(PLUGIN_NAME).dll .
+
+example: build
 
 clean:
 	rm -f $(PLUGIN_NAME).so $(PLUGIN_NAME).dll $(PLUGIN_NAME).h
