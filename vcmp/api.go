@@ -104,6 +104,8 @@ func (PlayerAPI) SetHeading(playerID int, angle float32) error {
 }
 func (PlayerAPI) GiveWeapon(playerID, weapon, ammo int)  { bridgeGiveWeapon(playerID, weapon, ammo) }
 func (PlayerAPI) RemoveAllWeapons(playerID int)            { bridgeRemoveAllWeapons(playerID) }
+func (PlayerAPI) WeaponAtSlot(playerID, slot int) int       { return bridgeGetPlayerWeaponAtSlot(playerID, slot) }
+func (PlayerAPI) RemoveWeapon(playerID, weaponID int) error { return bridgeRemovePlayerWeapon(playerID, weaponID) }
 func (PlayerAPI) PutInVehicle(playerID, vehicleID, slot int, makeRoom, warp bool) {
 	bridgePutInVehicle(playerID, vehicleID, slot, makeRoom, warp)
 }

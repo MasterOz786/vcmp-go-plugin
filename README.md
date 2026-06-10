@@ -50,6 +50,23 @@ See [`examples/blank`](examples/blank) for a minimal plugin template.
 ## Blank example
 
 ```bash
-make build
-# or: cd examples/blank && CGO_ENABLED=1 go build -buildmode=c-shared -o ../../plugins/goplugin04rel64.so .
+make build-blank
+# → plugins/goplugin04rel64.so
+```
+
+## Safari gamemode (Project Safari: Hydra Warfare)
+
+Builds the Safari server plugin from [`examples/safari`](examples/safari), linking the [`vcmp-go-server`](../../server) library.
+
+```bash
+make build-safari
+# → plugins/goserver04rel64.so
+```
+
+Cross-compile:
+
+```bash
+make build-linux-safari
+make build-windows-safari   # goserver04rel64.dll
+make build-all              # blank + safari
 ```
