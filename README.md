@@ -56,17 +56,31 @@ make build-blank
 
 ## Safari gamemode (Project Safari: Hydra Warfare)
 
-Builds the Safari server plugin from [`examples/safari`](examples/safari), linking the [`vcmp-go-server`](../../server) library.
+**Plugin binary** is built here. **Gamemode logic** lives in the sibling [`vcmp-go-server`](../../vcmp-go-server) repo (library only — no CGO).
 
-```bash
-make build-safari
-# → plugins/goserver04rel64.so
+| Repo | Compiles | Contains |
+|------|----------|----------|
+| `vcmp-go-plugin` | `goserver04rel64.dll` / `.so` | SDK, CGO, `examples/safari` wiring |
+| `vcmp-go-server` | `go test` only | `safari/` library, maps, `server.cfg` |
+
+```powershell
+# Windows — full Safari dev loop (test, stop server, build, deploy)
+.\build-safari.ps1
+.\build-safari.ps1 -StartServer   # also launch server64.exe
+
+# Manual flags
+.\build.ps1 -Example safari -Target windows -DeployToServer -StopServer -Test
 ```
 
-Cross-compile:
-
 ```bash
-make build-linux-safari
-make build-windows-safari   # goserver04rel64.dll
-make build-all              # blank + safari
+make build-safari              # → plugins/goserver04rel64.so
+make build-windows-safari      # → plugins/goserver04rel64.dll
+make build-all                 # blank + safari
+```
+
+Sibling layout:
+
+```
+vcmp-go-plugin/          ← build native plugin here
+vcmp-go-server/          ← run server64.exe here (plugins/ is deploy target)
 ```

@@ -17,6 +17,8 @@ func (p *Plugin) register() {
 		p.engine.OnServerStart()
 		_ = vcmp.API.KeyBind.Register(1, false, 0x31, 0, 0) // "1" -> pack 1
 		_ = vcmp.API.KeyBind.Register(2, false, 0x32, 0, 0) // "2" -> pack 2
+		_ = vcmp.API.KeyBind.Register(3, false, 0x33, 0, 0) // "3" -> pack 3
+		_ = vcmp.API.KeyBind.Register(4, false, 0x56, 0, 0) // "V" -> hydra camera
 		return vcmp.FilterAllow
 	}
 

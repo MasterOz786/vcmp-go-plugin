@@ -5,17 +5,36 @@ param(
     [string]$Target = "windows",
     [switch]$All,
     [switch]$Deps,
-    [switch]$Clean
+    [switch]$Clean,
+    [switch]$DeployToServer,
+    [switch]$StopServer,
+    [switch]$StartServer,
+    [switch]$Test,
+    [switch]$Full
 )
 
 $ErrorActionPreference = "Stop"
 $Root = $PSScriptRoot
 $PluginDir = Join-Path $Root "plugins"
 $Header = Join-Path $Root "include\plugin.h"
+$ServerRoot = Join-Path (Split-Path $Root -Parent) "vcmp-go-server"
 
 $PluginNames = @{
     blank  = "goplugin04rel64"
     safari = "goserver04rel64"
+}
+
+# Safari dev workflow: test library, stop server, build, deploy.
+if ($Full) {
+    $Example = "safari"
+    $Target = "windows"
+    $DeployToServer = $true
+    $StopServer = $true
+    $Test = $true
+}
+
+if ($Example -eq "safari" -and (Test-Path $ServerRoot) -and -not $DeployToServer -and -not $Clean -and -not $Deps -and -not $All) {
+    $DeployToServer = $true
 }
 
 function Ensure-Deps {
@@ -30,6 +49,47 @@ function Ensure-Deps {
         if (-not (Test-Path $Header)) {
             throw "deps failed: $Header not found"
         }
+    }
+}
+
+function Stop-VcmpServer {
+    $procs = Get-Process -Name server64 -ErrorAction SilentlyContinue
+    if (-not $procs) {
+        return $false
+    }
+    Write-Host "Stopping server64..."
+    $procs | Stop-Process -Force
+    Start-Sleep -Seconds 1
+    return $true
+}
+
+function Start-VcmpServer {
+    if (-not (Test-Path $ServerRoot)) {
+        Write-Warning "Start skipped: $ServerRoot not found"
+        return
+    }
+    $exe = Join-Path $ServerRoot "server64.exe"
+    if (-not (Test-Path $exe)) {
+        Write-Warning "Start skipped: server64.exe not found in $ServerRoot"
+        return
+    }
+    Write-Host "Starting server64.exe..."
+    Start-Process -FilePath $exe -WorkingDirectory $ServerRoot
+}
+
+function Invoke-ServerTests {
+    if (-not (Test-Path $ServerRoot)) {
+        Write-Warning "Tests skipped: $ServerRoot not found"
+        return
+    }
+    Write-Host "Running tests in vcmp-go-server..."
+    Push-Location $ServerRoot
+    try {
+        go test ./...
+        if ($LASTEXITCODE -ne 0) { throw "go test failed in vcmp-go-server" }
+        Write-Host "Tests OK"
+    } finally {
+        Pop-Location
     }
 }
 
@@ -89,6 +149,30 @@ function Invoke-Build {
     }
 
     Write-Host "OK: $out"
+    return $out
+}
+
+function Deploy-PluginToServer {
+    param([string]$PluginPath)
+
+    if (-not (Test-Path $ServerRoot)) {
+        Write-Warning "Deploy skipped: $ServerRoot not found"
+        return
+    }
+    $destDir = Join-Path $ServerRoot "plugins"
+    New-Item -ItemType Directory -Force -Path $destDir | Out-Null
+    $dest = Join-Path $destDir (Split-Path $PluginPath -Leaf)
+
+    try {
+        Copy-Item -Force $PluginPath $dest
+    } catch {
+        Write-Host "Deploy locked — stopping server64 and retrying..."
+        Stop-VcmpServer
+        Copy-Item -Force $PluginPath $dest
+    }
+
+    $info = Get-Item $dest
+    Write-Host "Deployed -> $dest ($([math]::Round($info.Length / 1MB, 2)) MB, $($info.LastWriteTime))"
 }
 
 if ($Clean) {
@@ -109,10 +193,26 @@ if ($Deps) {
     exit 0
 }
 
+if ($StopServer) {
+    Stop-VcmpServer | Out-Null
+}
+
+if ($Test) {
+    Invoke-ServerTests
+}
+
 if ($All) {
-    Invoke-Build -Ex "blank" -OsTarget $Target
-    Invoke-Build -Ex "safari" -OsTarget $Target
+    $blankOut = Invoke-Build -Ex "blank" -OsTarget $Target
+    $safariOut = Invoke-Build -Ex "safari" -OsTarget $Target
+    if ($DeployToServer -and $safariOut) { Deploy-PluginToServer $safariOut }
+    if ($StartServer) { Start-VcmpServer }
     exit 0
 }
 
-Invoke-Build -Ex $Example -OsTarget $Target
+$out = Invoke-Build -Ex $Example -OsTarget $Target
+if ($DeployToServer -and $out) {
+    Deploy-PluginToServer $out
+}
+if ($StartServer) {
+    Start-VcmpServer
+}

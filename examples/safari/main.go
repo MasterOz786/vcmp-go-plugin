@@ -1,3 +1,4 @@
+// Native VC:MP plugin entry — compiled here (vcmp-go-plugin), not in vcmp-go-server.
 package main
 
 /*

@@ -62,8 +62,18 @@ func defaultSafariMap() safari.MapConfig {
 		HydraStart:   safari.Vec3{X: -974, Y: -106, Z: 11.2},
 		HydraAngle:   90,
 		World:        0,
-		Waypoints:    []safari.Vec3{{X: -900, Y: -50, Z: 11.2}, {X: -800, Y: 0, Z: 11.2}},
-		EscortSpawns: []safari.Vec3{{X: -980, Y: -110, Z: 11.2}},
-		DefendSpawns: []safari.Vec3{{X: -850, Y: -20, Z: 11.2}},
+		Waypoints: []safari.Vec3{
+			{X: -1020, Y: 85, Z: 14.5},
+			{X: -880, Y: 115, Z: 14.5},
+			{X: -720, Y: 95, Z: 14.5},
+		},
+		EscortSpawns: []safari.Vec3{
+			{X: -1145, Y: 15, Z: 14.5},
+			{X: -1095, Y: -55, Z: 11.2},
+		},
+		DefendSpawns: []safari.Vec3{
+			{X: -920, Y: 175, Z: 22.0},
+			{X: -780, Y: -75, Z: 11.2},
+		},
 	}
 }
