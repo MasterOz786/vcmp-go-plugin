@@ -327,22 +327,6 @@ static vcmpError vcmp_get_object_rotation(int32_t objectId, float *x, float *y, 
 	if (g_pf && g_pf->GetObjectRotation) return g_pf->GetObjectRotation(objectId, x, y, z, w);
 	return vcmpErrorNoSuchEntity;
 }
-static vcmpError vcmp_set_vehicle_3d_arrow_for_player(int32_t vehicleId, int32_t targetPlayerId, uint8_t enabled) {
-	if (g_pf && g_pf->SetVehicle3DArrowForPlayer) return g_pf->SetVehicle3DArrowForPlayer(vehicleId, targetPlayerId, enabled);
-	return vcmpErrorNoSuchEntity;
-}
-static uint8_t vcmp_get_vehicle_3d_arrow_for_player(int32_t vehicleId, int32_t targetPlayerId) {
-	if (g_pf && g_pf->GetVehicle3DArrowForPlayer) return g_pf->GetVehicle3DArrowForPlayer(vehicleId, targetPlayerId);
-	return 0;
-}
-static vcmpError vcmp_set_player_3d_arrow_for_player(int32_t playerId, int32_t targetPlayerId, uint8_t enabled) {
-	if (g_pf && g_pf->SetPlayer3DArrowForPlayer) return g_pf->SetPlayer3DArrowForPlayer(playerId, targetPlayerId, enabled);
-	return vcmpErrorNoSuchEntity;
-}
-static uint8_t vcmp_get_player_3d_arrow_for_player(int32_t playerId, int32_t targetPlayerId) {
-	if (g_pf && g_pf->GetPlayer3DArrowForPlayer) return g_pf->GetPlayer3DArrowForPlayer(playerId, targetPlayerId);
-	return 0;
-}
 */
 import "C"
 
@@ -721,14 +705,14 @@ func bridgeGetObjectRotation(objectID int) (Quat, error) {
 }
 
 func bridgeSetVehicle3DArrowForPlayer(vehicleID, targetPlayerID int, enabled bool) error {
-	return bridgeError(C.vcmp_set_vehicle_3d_arrow_for_player(C.int32_t(vehicleID), C.int32_t(targetPlayerID), boolToU8(enabled)))
+	return errPluginAPINotAvailable
 }
 func bridgeGetVehicle3DArrowForPlayer(vehicleID, targetPlayerID int) bool {
-	return C.vcmp_get_vehicle_3d_arrow_for_player(C.int32_t(vehicleID), C.int32_t(targetPlayerID)) != 0
+	return false
 }
 func bridgeSetPlayer3DArrowForPlayer(playerID, targetPlayerID int, enabled bool) error {
-	return bridgeError(C.vcmp_set_player_3d_arrow_for_player(C.int32_t(playerID), C.int32_t(targetPlayerID), boolToU8(enabled)))
+	return errPluginAPINotAvailable
 }
 func bridgeGetPlayer3DArrowForPlayer(playerID, targetPlayerID int) bool {
-	return C.vcmp_get_player_3d_arrow_for_player(C.int32_t(playerID), C.int32_t(targetPlayerID)) != 0
+	return false
 }
