@@ -22,5 +22,5 @@ require (
 
 replace (
 	github.com/masteroz/vcmp-go-plugin => ..
-	github.com/masteroz/vcmp-go-server => ../../vcmp-go-server
+	github.com/masteroz/vcmp-go-server => ../../server
 )

@@ -107,6 +107,14 @@ func (p *Plugin) register() {
 		return vcmp.FilterDeny
 	}
 
+	vcmp.Events.OnPlayerEnterVehicle = func(playerID, vehicleID, slot int) {
+		p.engine.OnPlayerEnterVehicle(playerID, vehicleID, slot)
+	}
+
+	vcmp.Events.OnPlayerExitVehicle = func(playerID, vehicleID int) {
+		p.engine.OnPlayerExitVehicle(playerID, vehicleID)
+	}
+
 	vcmp.Events.OnIncomingConnection = func(name, password, ip string) string {
 		_, _, _ = password, ip, name
 		return name
