@@ -317,10 +317,6 @@ static int32_t vcmp_get_kill_command_delay(void) {
 	if (g_pf && g_pf->GetKillCommandDelay) return g_pf->GetKillCommandDelay();
 	return 0;
 }
-static vcmpError vcmp_kill_player(int32_t playerId) {
-	if (g_pf && g_pf->KillPlayer) return g_pf->KillPlayer(playerId);
-	return vcmpErrorNoSuchEntity;
-}
 static vcmpError vcmp_set_camera_position(int32_t playerId, float posX, float posY, float posZ, float lookX, float lookY, float lookZ) {
 	if (g_pf && g_pf->SetCameraPosition) return g_pf->SetCameraPosition(playerId, posX, posY, posZ, lookX, lookY, lookZ);
 	return vcmpErrorNoSuchEntity;
@@ -731,7 +727,7 @@ func bridgeSetKillCommandDelay(delay int) { C.vcmp_set_kill_command_delay(C.int3
 func bridgeGetKillCommandDelay() int { return int(C.vcmp_get_kill_command_delay()) }
 
 func bridgeKillPlayer(playerID int) error {
-	return bridgeError(C.vcmp_kill_player(C.int32_t(playerID)))
+	return errPluginAPINotAvailable
 }
 
 func bridgeSetCameraPosition(playerID int, pos, lookAt Vec3) error {

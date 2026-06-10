@@ -1,7 +1,8 @@
+// Native VC:MP Safari plugin entry — compiled here (vcmp-go-plugin), not in vcmp-go-server.
 package main
 
 /*
-#cgo CFLAGS: -I${SRCDIR}/../../include
+#cgo CFLAGS: -I${SRCDIR}/../include
 #include "plugin.h"
 */
 import "C"

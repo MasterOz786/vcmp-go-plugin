@@ -71,7 +71,7 @@ const (
 	PlayerOptionCanAttack        PlayerOption = PlayerOption(C.vcmpPlayerOptionCanAttack)
 	PlayerOptionHasMarker        PlayerOption = PlayerOption(C.vcmpPlayerOptionHasMarker)
 	PlayerOptionChatTagsEnabled PlayerOption = PlayerOption(C.vcmpPlayerOptionChatTagsEnabled)
-	PlayerOptionBleeding        PlayerOption = PlayerOption(C.vcmpPlayerOptionBleeding)
+	PlayerOptionDrunkEffects    PlayerOption = PlayerOption(C.vcmpPlayerOptionDrunkEffects)
 )
 
 type VehicleOption int
@@ -83,10 +83,7 @@ const (
 	VehicleOptionRadioLocked VehicleOption = VehicleOption(C.vcmpVehicleOptionRadioLocked)
 	VehicleOptionGhost       VehicleOption = VehicleOption(C.vcmpVehicleOptionGhost)
 	VehicleOptionSiren       VehicleOption = VehicleOption(C.vcmpVehicleOptionSiren)
-	VehicleOptionSingleUse      VehicleOption = VehicleOption(C.vcmpVehicleOptionSingleUse)
-	VehicleOptionEngineDisabled VehicleOption = VehicleOption(C.vcmpVehicleOptionEngineDisabled)
-	VehicleOptionBootOpen       VehicleOption = VehicleOption(C.vcmpVehicleOptionBootOpen)
-	VehicleOptionBonnetOpen     VehicleOption = VehicleOption(C.vcmpVehicleOptionBonnetOpen)
+	VehicleOptionSingleUse VehicleOption = VehicleOption(C.vcmpVehicleOptionSingleUse)
 )
 
 type PickupOption int

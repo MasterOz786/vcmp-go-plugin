@@ -52,39 +52,21 @@ static int32_t vcmp_get_player_spectate_target(int32_t playerId) {
 	if (g_pf && g_pf->GetPlayerSpectateTarget) return g_pf->GetPlayerSpectateTarget(playerId);
 	return -1;
 }
-static vcmpError vcmp_interpolate_camera_look_at(int32_t playerId, float lookX, float lookY, float lookZ, uint32_t interpTimeMS) {
-	if (g_pf && g_pf->InterpolateCameraLookAt) return g_pf->InterpolateCameraLookAt(playerId, lookX, lookY, lookZ, interpTimeMS);
-	return vcmpErrorNoSuchEntity;
-}
-static vcmpError vcmp_set_player_drunk_handling(int32_t playerId, uint32_t level) {
-	if (g_pf && g_pf->SetPlayerDrunkHandling) return g_pf->SetPlayerDrunkHandling(playerId, level);
-	return vcmpErrorNoSuchEntity;
-}
-static uint32_t vcmp_get_player_drunk_handling(int32_t playerId) {
-	if (g_pf && g_pf->GetPlayerDrunkHandling) return g_pf->GetPlayerDrunkHandling(playerId);
-	return 0;
-}
-static vcmpError vcmp_set_player_drunk_visuals(int32_t playerId, uint8_t level) {
-	if (g_pf && g_pf->SetPlayerDrunkVisuals) return g_pf->SetPlayerDrunkVisuals(playerId, level);
-	return vcmpErrorNoSuchEntity;
-}
-static uint8_t vcmp_get_player_drunk_visuals(int32_t playerId) {
-	if (g_pf && g_pf->GetPlayerDrunkVisuals) return g_pf->GetPlayerDrunkVisuals(playerId);
-	return 0;
-}
 */
 import "C"
+
+import "errors"
 
 type WorldBounds struct {
 	MaxX, MinX, MaxY, MinY float32
 }
 
 type BlipInfo struct {
-	World             int
-	Position          Vec3
-	Scale             int
-	Colour            uint32
-	Sprite            int
+	World    int
+	Position Vec3
+	Scale    int
+	Colour   uint32
+	Sprite   int
 }
 
 func bridgePlaySound(world, soundID int, pos Vec3) error {
@@ -163,24 +145,24 @@ func bridgeGetPlayerSpectateTarget(playerID int) int {
 	return int(C.vcmp_get_player_spectate_target(C.int32_t(playerID)))
 }
 
+var errPluginAPINotAvailable = errors.New("vcmp: not available in VC:MP 0.4 plugin.h")
+
 func bridgeInterpolateCameraLookAt(playerID int, lookAt Vec3, interpMs uint32) error {
-	return bridgeError(C.vcmp_interpolate_camera_look_at(
-		C.int32_t(playerID), C.float(lookAt.X), C.float(lookAt.Y), C.float(lookAt.Z), C.uint32_t(interpMs),
-	))
+	return errPluginAPINotAvailable
 }
 
 func bridgeSetPlayerDrunkHandling(playerID int, level uint32) error {
-	return bridgeError(C.vcmp_set_player_drunk_handling(C.int32_t(playerID), C.uint32_t(level)))
+	return errPluginAPINotAvailable
 }
 
 func bridgeGetPlayerDrunkHandling(playerID int) uint32 {
-	return uint32(C.vcmp_get_player_drunk_handling(C.int32_t(playerID)))
+	return 0
 }
 
 func bridgeSetPlayerDrunkVisuals(playerID int, level uint8) error {
-	return bridgeError(C.vcmp_set_player_drunk_visuals(C.int32_t(playerID), C.uint8_t(level)))
+	return errPluginAPINotAvailable
 }
 
 func bridgeGetPlayerDrunkVisuals(playerID int) uint8 {
-	return uint8(C.vcmp_get_player_drunk_visuals(C.int32_t(playerID)))
+	return 0
 }

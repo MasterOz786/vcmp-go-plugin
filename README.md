@@ -1,6 +1,6 @@
 # vcmp-go-plugin
 
-Public Go SDK for [VC:MP](https://vc-mp.com/) 0.4 native server plugins.
+Public Go SDK for [VC:MP](https://vc-mp.com/) 0.4 native server plugins, plus the Safari gamemode native binary.
 
 ## Install
 
@@ -10,9 +10,34 @@ go get github.com/masteroz/vcmp-go-plugin/vcmp
 
 Requires CGO and `include/plugin.h` (bundled in this repo, or run `make deps` to fetch the latest from upstream).
 
-## Build a plugin
+## Layout
 
-Your gamemode repo imports this module and sets hooks in `init()`:
+| Path | Role |
+|------|------|
+| `vcmp/` | SDK — API wrappers, events, CGO bridge |
+| `plugin/` | Safari plugin `main` — builds `goserver04rel64.dll` / `.so` |
+| `plugins/` | Build output (gitignored) |
+
+Gamemode rules live in the sibling [`vcmp-go-server`](https://github.com/masteroz/vcmp-go-server) repo (`safari/` library).
+
+## Build Safari plugin
+
+```powershell
+cd D:\vcmp-go-plugin
+.\build.ps1 -Test -StopServer          # test library, stop server, build, deploy
+.\build.ps1 -Test -StopServer -StartServer
+```
+
+```bash
+make build                 # → plugins/goserver04rel64.so
+make build-windows         # → plugins/goserver04rel64.dll
+```
+
+Deploy target (default): sibling `../vcmp-go-server/plugins/`. Override with `-ServerRoot`.
+
+## Write your own plugin
+
+Set hooks in `init()` and build with `-buildmode=c-shared`:
 
 ```go
 func init() {
@@ -20,53 +45,9 @@ func init() {
         return vcmp.PluginMeta{Name: "MyMode", Version: 0x00010000}
     }
     vcmp.OnLoad = func() {
-        // wire vcmp.Events, start gamemode logic
+        // wire vcmp.Events
     }
 }
 ```
 
-```go
-package main
-
-import "github.com/masteroz/vcmp-go-plugin/vcmp"
-
-func main() {}
-```
-
-```bash
-CGO_ENABLED=1 go build -buildmode=c-shared -o myplugin04rel64.so .
-```
-
-Copy the built `.so` or `.dll` into the VC:MP server's `plugins/` folder and add `plugins myplugin04rel64` to `server.cfg`.
-
-## API surface
-
-- **`vcmp.API`** — typed wrappers (`API.Player.GiveWeapon`, `API.Vehicle.Create`, …)
-- **`vcmp.Events`** — register VC:MP callback handlers before players connect
-- **`vcmp.Init`** — bind natives, set plugin info, register all callbacks
-
-See [`examples/blank`](examples/blank) for a minimal plugin template.
-
-## Blank example
-
-```bash
-make build-blank
-# → plugins/goplugin04rel64.so
-```
-
-## Safari gamemode (Project Safari: Hydra Warfare)
-
-Builds the Safari server plugin from [`examples/safari`](examples/safari), linking the [`vcmp-go-server`](../../server) library.
-
-```bash
-make build-safari
-# → plugins/goserver04rel64.so
-```
-
-Cross-compile:
-
-```bash
-make build-linux-safari
-make build-windows-safari   # goserver04rel64.dll
-make build-all              # blank + safari
-```
+Copy the built `.dll` / `.so` into the VC:MP server's `plugins/` folder and add it to `server.cfg`.
