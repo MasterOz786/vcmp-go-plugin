@@ -293,6 +293,105 @@ static uint8_t vcmp_check_entity_exists(vcmpEntityPool pool, int32_t index) {
 	if (g_pf && g_pf->CheckEntityExists) return g_pf->CheckEntityExists(pool, index);
 	return 0;
 }
+static uint8_t vcmp_get_server_option(vcmpServerOption option) {
+	if (g_pf && g_pf->GetServerOption) return g_pf->GetServerOption(option);
+	return 0;
+}
+static void vcmp_get_gamemode_text(char *buf, size_t buflen) {
+	if (buf && buflen > 0) buf[0] = '\0';
+	if (g_pf && g_pf->GetGameModeText && buf && buflen > 0) g_pf->GetGameModeText(buf, buflen);
+}
+static void vcmp_set_spawn_camera_position(float x, float y, float z) {
+	if (g_pf && g_pf->SetSpawnCameraPosition) g_pf->SetSpawnCameraPosition(x, y, z);
+}
+static void vcmp_set_spawn_camera_look_at(float x, float y, float z) {
+	if (g_pf && g_pf->SetSpawnCameraLookAt) g_pf->SetSpawnCameraLookAt(x, y, z);
+}
+static void vcmp_force_all_select(void) {
+	if (g_pf && g_pf->ForceAllSelect) g_pf->ForceAllSelect();
+}
+static void vcmp_set_kill_command_delay(int32_t delay) {
+	if (g_pf && g_pf->SetKillCommandDelay) g_pf->SetKillCommandDelay(delay);
+}
+static int32_t vcmp_get_kill_command_delay(void) {
+	if (g_pf && g_pf->GetKillCommandDelay) return g_pf->GetKillCommandDelay();
+	return 0;
+}
+static vcmpError vcmp_kill_player(int32_t playerId) {
+	if (g_pf && g_pf->KillPlayer) return g_pf->KillPlayer(playerId);
+	return vcmpErrorNoSuchEntity;
+}
+static vcmpError vcmp_set_camera_position(int32_t playerId, float posX, float posY, float posZ, float lookX, float lookY, float lookZ) {
+	if (g_pf && g_pf->SetCameraPosition) return g_pf->SetCameraPosition(playerId, posX, posY, posZ, lookX, lookY, lookZ);
+	return vcmpErrorNoSuchEntity;
+}
+static vcmpError vcmp_restore_camera(int32_t playerId) {
+	if (g_pf && g_pf->RestoreCamera) return g_pf->RestoreCamera(playerId);
+	return vcmpErrorNoSuchEntity;
+}
+static uint8_t vcmp_is_camera_locked(int32_t playerId) {
+	if (g_pf && g_pf->IsCameraLocked) return g_pf->IsCameraLocked(playerId);
+	return 0;
+}
+static int32_t vcmp_get_player_class(int32_t playerId) {
+	if (g_pf && g_pf->GetPlayerClass) return g_pf->GetPlayerClass(playerId);
+	return -1;
+}
+static vcmpError vcmp_set_player_skin(int32_t playerId, int32_t skinId) {
+	if (g_pf && g_pf->SetPlayerSkin) return g_pf->SetPlayerSkin(playerId, skinId);
+	return vcmpErrorNoSuchEntity;
+}
+static int32_t vcmp_get_player_skin(int32_t playerId) {
+	if (g_pf && g_pf->GetPlayerSkin) return g_pf->GetPlayerSkin(playerId);
+	return 0;
+}
+static vcmpError vcmp_set_player_colour(int32_t playerId, uint32_t colour) {
+	if (g_pf && g_pf->SetPlayerColour) return g_pf->SetPlayerColour(playerId, colour);
+	return vcmpErrorNoSuchEntity;
+}
+static uint32_t vcmp_get_player_colour(int32_t playerId) {
+	if (g_pf && g_pf->GetPlayerColour) return g_pf->GetPlayerColour(playerId);
+	return 0;
+}
+static int32_t vcmp_get_player_in_vehicle_slot(int32_t playerId) {
+	if (g_pf && g_pf->GetPlayerInVehicleSlot) return g_pf->GetPlayerInVehicleSlot(playerId);
+	return -1;
+}
+static vcmpError vcmp_set_player_wanted_level(int32_t playerId, int32_t level) {
+	if (g_pf && g_pf->SetPlayerWantedLevel) return g_pf->SetPlayerWantedLevel(playerId, level);
+	return vcmpErrorNoSuchEntity;
+}
+static int32_t vcmp_get_player_wanted_level(int32_t playerId) {
+	if (g_pf && g_pf->GetPlayerWantedLevel) return g_pf->GetPlayerWantedLevel(playerId);
+	return 0;
+}
+static int32_t vcmp_get_vehicle_sync_source(int32_t vehicleId) {
+	if (g_pf && g_pf->GetVehicleSyncSource) return g_pf->GetVehicleSyncSource(vehicleId);
+	return -1;
+}
+static vcmpVehicleSync vcmp_get_vehicle_sync_type(int32_t vehicleId) {
+	if (g_pf && g_pf->GetVehicleSyncType) return g_pf->GetVehicleSyncType(vehicleId);
+	return vcmpVehicleSyncNone;
+}
+static vcmpError vcmp_set_vehicle_immunity_flags(int32_t vehicleId, uint32_t flags) {
+	if (g_pf && g_pf->SetVehicleImmunityFlags) return g_pf->SetVehicleImmunityFlags(vehicleId, flags);
+	return vcmpErrorNoSuchEntity;
+}
+static uint32_t vcmp_get_vehicle_immunity_flags(int32_t vehicleId) {
+	if (g_pf && g_pf->GetVehicleImmunityFlags) return g_pf->GetVehicleImmunityFlags(vehicleId);
+	return 0;
+}
+static vcmpError vcmp_get_vehicle_colour(int32_t vehicleId, int32_t *c1, int32_t *c2) {
+	if (g_pf && g_pf->GetVehicleColour) return g_pf->GetVehicleColour(vehicleId, c1, c2);
+	return vcmpErrorNoSuchEntity;
+}
+static void vcmp_remove_all_key_binds(void) {
+	if (g_pf && g_pf->RemoveAllKeyBinds) g_pf->RemoveAllKeyBinds();
+}
+static int32_t vcmp_get_key_bind_unused_slot(void) {
+	if (g_pf && g_pf->GetKeyBindUnusedSlot) return g_pf->GetKeyBindUnusedSlot();
+	return -1;
+}
 */
 import "C"
 
@@ -605,6 +704,112 @@ func bridgeRemoveKeyBind(bindID int) error {
 func bridgeCheckEntityExists(pool EntityPool, index int) bool {
 	return C.vcmp_check_entity_exists(C.vcmpEntityPool(pool), C.int32_t(index)) != 0
 }
+
+func bridgeGetServerOption(option ServerOption) bool {
+	return C.vcmp_get_server_option(C.vcmpServerOption(option)) != 0
+}
+
+func bridgeGetGameModeText() string {
+	buf := (*[128]C.char)(C.malloc(128))
+	defer C.free(unsafe.Pointer(buf))
+	C.vcmp_get_gamemode_text(&buf[0], 128)
+	return C.GoString(&buf[0])
+}
+
+func bridgeSetSpawnCameraPosition(pos Vec3) {
+	C.vcmp_set_spawn_camera_position(C.float(pos.X), C.float(pos.Y), C.float(pos.Z))
+}
+
+func bridgeSetSpawnCameraLookAt(pos Vec3) {
+	C.vcmp_set_spawn_camera_look_at(C.float(pos.X), C.float(pos.Y), C.float(pos.Z))
+}
+
+func bridgeForceAllSelect() { C.vcmp_force_all_select() }
+
+func bridgeSetKillCommandDelay(delay int) { C.vcmp_set_kill_command_delay(C.int32_t(delay)) }
+
+func bridgeGetKillCommandDelay() int { return int(C.vcmp_get_kill_command_delay()) }
+
+func bridgeKillPlayer(playerID int) error {
+	return bridgeError(C.vcmp_kill_player(C.int32_t(playerID)))
+}
+
+func bridgeSetCameraPosition(playerID int, pos, lookAt Vec3) error {
+	return bridgeError(C.vcmp_set_camera_position(
+		C.int32_t(playerID),
+		C.float(pos.X), C.float(pos.Y), C.float(pos.Z),
+		C.float(lookAt.X), C.float(lookAt.Y), C.float(lookAt.Z),
+	))
+}
+
+func bridgeRestoreCamera(playerID int) error {
+	return bridgeError(C.vcmp_restore_camera(C.int32_t(playerID)))
+}
+
+func bridgeIsCameraLocked(playerID int) bool {
+	return C.vcmp_is_camera_locked(C.int32_t(playerID)) != 0
+}
+
+func bridgeGetPlayerClass(playerID int) int {
+	return int(C.vcmp_get_player_class(C.int32_t(playerID)))
+}
+
+func bridgeSetPlayerSkin(playerID, skinID int) error {
+	return bridgeError(C.vcmp_set_player_skin(C.int32_t(playerID), C.int32_t(skinID)))
+}
+
+func bridgeGetPlayerSkin(playerID int) int {
+	return int(C.vcmp_get_player_skin(C.int32_t(playerID)))
+}
+
+func bridgeSetPlayerColour(playerID int, colour uint32) error {
+	return bridgeError(C.vcmp_set_player_colour(C.int32_t(playerID), C.uint32_t(colour)))
+}
+
+func bridgeGetPlayerColour(playerID int) uint32 {
+	return uint32(C.vcmp_get_player_colour(C.int32_t(playerID)))
+}
+
+func bridgeGetPlayerInVehicleSlot(playerID int) int {
+	return int(C.vcmp_get_player_in_vehicle_slot(C.int32_t(playerID)))
+}
+
+func bridgeSetPlayerWantedLevel(playerID, level int) error {
+	return bridgeError(C.vcmp_set_player_wanted_level(C.int32_t(playerID), C.int32_t(level)))
+}
+
+func bridgeGetPlayerWantedLevel(playerID int) int {
+	return int(C.vcmp_get_player_wanted_level(C.int32_t(playerID)))
+}
+
+func bridgeGetVehicleSyncSource(vehicleID int) int {
+	return int(C.vcmp_get_vehicle_sync_source(C.int32_t(vehicleID)))
+}
+
+func bridgeGetVehicleSyncType(vehicleID int) VehicleSync {
+	return VehicleSync(C.vcmp_get_vehicle_sync_type(C.int32_t(vehicleID)))
+}
+
+func bridgeSetVehicleImmunityFlags(vehicleID int, flags uint32) error {
+	return bridgeError(C.vcmp_set_vehicle_immunity_flags(C.int32_t(vehicleID), C.uint32_t(flags)))
+}
+
+func bridgeGetVehicleImmunityFlags(vehicleID int) uint32 {
+	return uint32(C.vcmp_get_vehicle_immunity_flags(C.int32_t(vehicleID)))
+}
+
+func bridgeGetVehicleColour(vehicleID int) (primary, secondary int, err error) {
+	var c1, c2 C.int32_t
+	code := C.vcmp_get_vehicle_colour(C.int32_t(vehicleID), &c1, &c2)
+	if code != C.vcmpErrorNone {
+		return 0, 0, bridgeError(C.vcmpError(code))
+	}
+	return int(c1), int(c2), nil
+}
+
+func bridgeRemoveAllKeyBinds() { C.vcmp_remove_all_key_binds() }
+
+func bridgeGetKeyBindUnusedSlot() int { return int(C.vcmp_get_key_bind_unused_slot()) }
 
 func bridgeError(code C.vcmpError) error {
 	if code == C.vcmpErrorNone {

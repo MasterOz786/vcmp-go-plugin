@@ -70,8 +70,8 @@ const (
 	PlayerOptionShowMarkers      PlayerOption = PlayerOption(C.vcmpPlayerOptionShowMarkers)
 	PlayerOptionCanAttack        PlayerOption = PlayerOption(C.vcmpPlayerOptionCanAttack)
 	PlayerOptionHasMarker        PlayerOption = PlayerOption(C.vcmpPlayerOptionHasMarker)
-	PlayerOptionChatTagsEnabled  PlayerOption = PlayerOption(C.vcmpPlayerOptionChatTagsEnabled)
-	PlayerOptionDrunkEffects     PlayerOption = PlayerOption(C.vcmpPlayerOptionDrunkEffects)
+	PlayerOptionChatTagsEnabled PlayerOption = PlayerOption(C.vcmpPlayerOptionChatTagsEnabled)
+	PlayerOptionBleeding        PlayerOption = PlayerOption(C.vcmpPlayerOptionBleeding)
 )
 
 type VehicleOption int
@@ -83,7 +83,10 @@ const (
 	VehicleOptionRadioLocked VehicleOption = VehicleOption(C.vcmpVehicleOptionRadioLocked)
 	VehicleOptionGhost       VehicleOption = VehicleOption(C.vcmpVehicleOptionGhost)
 	VehicleOptionSiren       VehicleOption = VehicleOption(C.vcmpVehicleOptionSiren)
-	VehicleOptionSingleUse   VehicleOption = VehicleOption(C.vcmpVehicleOptionSingleUse)
+	VehicleOptionSingleUse      VehicleOption = VehicleOption(C.vcmpVehicleOptionSingleUse)
+	VehicleOptionEngineDisabled VehicleOption = VehicleOption(C.vcmpVehicleOptionEngineDisabled)
+	VehicleOptionBootOpen       VehicleOption = VehicleOption(C.vcmpVehicleOptionBootOpen)
+	VehicleOptionBonnetOpen     VehicleOption = VehicleOption(C.vcmpVehicleOptionBonnetOpen)
 )
 
 type PickupOption int
@@ -145,6 +148,15 @@ const (
 	PlayerVehicleEntering PlayerVehicle = PlayerVehicle(C.vcmpPlayerVehicleEntering)
 	PlayerVehicleExiting  PlayerVehicle = PlayerVehicle(C.vcmpPlayerVehicleExiting)
 	PlayerVehicleIn       PlayerVehicle = PlayerVehicle(C.vcmpPlayerVehicleIn)
+)
+
+type VehicleSync int
+
+const (
+	VehicleSyncNone      VehicleSync = VehicleSync(C.vcmpVehicleSyncNone)
+	VehicleSyncDriver    VehicleSync = VehicleSync(C.vcmpVehicleSyncDriver)
+	VehicleSyncPassenger VehicleSync = VehicleSync(C.vcmpVehicleSyncPassenger)
+	VehicleSyncNear      VehicleSync = VehicleSync(C.vcmpVehicleSyncNear)
 )
 
 type VehicleUpdate int

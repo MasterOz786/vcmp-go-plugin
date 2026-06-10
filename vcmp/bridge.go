@@ -89,11 +89,21 @@ static int32_t vcmp_get_vehicle_occupant(int32_t vehicleId, int32_t slot) {
 	if (g_pf && g_pf->GetVehicleOccupant) return g_pf->GetVehicleOccupant(vehicleId, slot);
 	return -1;
 }
-static void vcmp_set_vehicle_part_status(int32_t vehicleId, int32_t partId, int32_t status) {
-	if (g_pf && g_pf->SetVehiclePartStatus) g_pf->SetVehiclePartStatus(vehicleId, partId, status);
+static vcmpError vcmp_set_vehicle_part_status(int32_t vehicleId, int32_t partId, int32_t status) {
+	if (g_pf && g_pf->SetVehiclePartStatus) return g_pf->SetVehiclePartStatus(vehicleId, partId, status);
+	return vcmpErrorNoSuchEntity;
 }
-static void vcmp_set_vehicle_tyre_status(int32_t vehicleId, int32_t tyreId, int32_t status) {
-	if (g_pf && g_pf->SetVehicleTyreStatus) g_pf->SetVehicleTyreStatus(vehicleId, tyreId, status);
+static int32_t vcmp_get_vehicle_part_status(int32_t vehicleId, int32_t partId) {
+	if (g_pf && g_pf->GetVehiclePartStatus) return g_pf->GetVehiclePartStatus(vehicleId, partId);
+	return 0;
+}
+static vcmpError vcmp_set_vehicle_tyre_status(int32_t vehicleId, int32_t tyreId, int32_t status) {
+	if (g_pf && g_pf->SetVehicleTyreStatus) return g_pf->SetVehicleTyreStatus(vehicleId, tyreId, status);
+	return vcmpErrorNoSuchEntity;
+}
+static int32_t vcmp_get_vehicle_tyre_status(int32_t vehicleId, int32_t tyreId) {
+	if (g_pf && g_pf->GetVehicleTyreStatus) return g_pf->GetVehicleTyreStatus(vehicleId, tyreId);
+	return 0;
 }
 static int32_t vcmp_get_player_team(int32_t playerId) {
 	if (g_pf && g_pf->GetPlayerTeam) return g_pf->GetPlayerTeam(playerId);
@@ -281,9 +291,25 @@ func bridgeVehicleOccupant(vehicleID, slot int) int {
 }
 
 func bridgeBreakVehicle(vehicleID int) {
-	C.vcmp_set_vehicle_part_status(C.int32_t(vehicleID), 0, 3)
-	C.vcmp_set_vehicle_tyre_status(C.int32_t(vehicleID), 3, 1)
-	C.vcmp_set_vehicle_part_status(C.int32_t(vehicleID), 4, 2)
+	_ = C.vcmp_set_vehicle_part_status(C.int32_t(vehicleID), 0, 3)
+	_ = C.vcmp_set_vehicle_tyre_status(C.int32_t(vehicleID), 3, 1)
+	_ = C.vcmp_set_vehicle_part_status(C.int32_t(vehicleID), 4, 2)
+}
+
+func bridgeSetVehiclePartStatus(vehicleID, partID, status int) error {
+	return bridgeError(C.vcmp_set_vehicle_part_status(C.int32_t(vehicleID), C.int32_t(partID), C.int32_t(status)))
+}
+
+func bridgeGetVehiclePartStatus(vehicleID, partID int) int {
+	return int(C.vcmp_get_vehicle_part_status(C.int32_t(vehicleID), C.int32_t(partID)))
+}
+
+func bridgeSetVehicleTyreStatus(vehicleID, tyreID, status int) error {
+	return bridgeError(C.vcmp_set_vehicle_tyre_status(C.int32_t(vehicleID), C.int32_t(tyreID), C.int32_t(status)))
+}
+
+func bridgeGetVehicleTyreStatus(vehicleID, tyreID int) int {
+	return int(C.vcmp_get_vehicle_tyre_status(C.int32_t(vehicleID), C.int32_t(tyreID)))
 }
 
 func bridgeServerTimeMs() uint64 {
