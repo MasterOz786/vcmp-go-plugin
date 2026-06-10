@@ -113,4 +113,10 @@ func (p *Plugin) register() {
 	vcmp.Events.OnPlayerCrashReport = func(playerID int, report string) {
 		vcmp.API.Server.Log(fmt.Sprintf("[safari] crash report from %d: %s", playerID, report))
 	}
+
+	vcmp.Events.OnClientScriptData = func(playerID int, data []byte) {
+		if p.engine != nil {
+			p.engine.HandleClientScriptData(playerID, data)
+		}
+	}
 }
