@@ -18,7 +18,7 @@ $Header = Join-Path $Root "include\plugin.h"
 $PluginName = "goserver04rel64"
 
 if (-not $ServerRoot) {
-    $ServerRoot = Join-Path (Split-Path $Root -Parent) "vcmp-go-server"
+    $ServerRoot = Join-Path (Split-Path $Root -Parent) "server"
 }
 
 function Ensure-Deps {
@@ -66,11 +66,11 @@ function Invoke-ServerTests {
         Write-Warning "Tests skipped: $ServerRoot not found"
         return
     }
-    Write-Host "Running tests in vcmp-go-server..."
+    Write-Host "Running tests in server..."
     Push-Location $ServerRoot
     try {
         go test ./...
-        if ($LASTEXITCODE -ne 0) { throw "go test failed in vcmp-go-server" }
+        if ($LASTEXITCODE -ne 0) { throw "go test failed in server" }
         Write-Host "Tests OK"
     } finally {
         Pop-Location
@@ -149,6 +149,13 @@ function Deploy-PluginToServer {
 
     $info = Get-Item $dest
     Write-Host "Deployed -> $dest ($([math]::Round($info.Length / 1MB, 2)) MB, $($info.LastWriteTime))"
+
+    $clientScript = Join-Path $ServerRoot "store\script\main.nut"
+    if (Test-Path $clientScript) {
+        Write-Host "Client script OK: $clientScript"
+    } else {
+        Write-Warning "Missing $clientScript — Hydra camera will not work until store/script/main.nut is next to server64.exe"
+    }
 }
 
 if ($Clean) {
