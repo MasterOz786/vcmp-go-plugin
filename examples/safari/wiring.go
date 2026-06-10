@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/masteroz/vcmp-go-plugin/vcmp"
-	"github.com/masteroz/vcmp-go-server/safari"
 )
 
 func (p *Plugin) register() {
@@ -24,16 +23,16 @@ func (p *Plugin) register() {
 		p.shutdown()
 	}
 
-	vcmp.Events.OnServerFrame = func(_ float32) {
-		p.engine.OnServerFrame()
+	vcmp.Events.OnServerFrame = func(elapsed float32) {
+		p.engine.OnServerFrame(elapsed)
 	}
 
 	vcmp.Events.OnPlayerConnect = func(playerID int) {
-		p.engine.Enqueue(safari.NewConnectEvent(playerID))
+		p.engine.OnConnect(playerID)
 	}
 
 	vcmp.Events.OnPlayerDisconnect = func(playerID int, _ vcmp.DisconnectReason) {
-		p.engine.Enqueue(safari.NewDisconnectEvent(playerID))
+		p.engine.OnDisconnect(playerID)
 	}
 
 	vcmp.Events.OnPlayerRequestSpawn = func(playerID int) vcmp.FilterResult {
@@ -51,19 +50,17 @@ func (p *Plugin) register() {
 	}
 
 	vcmp.Events.OnPlayerSpawn = func(playerID int) {
-		p.engine.SchedulePlayerLoadout(playerID)
-		p.engine.Enqueue(safari.NewSpawnEvent(playerID))
+		p.engine.OnSpawn(playerID)
 	}
 
 	vcmp.Events.OnPlayerStateChange = func(playerID int, oldState, newState vcmp.PlayerState) {
 		if oldState == vcmp.PlayerStateUnspawned && newState == vcmp.PlayerStateNormal {
-			p.engine.SchedulePlayerLoadout(playerID)
-			p.engine.Enqueue(safari.NewSpawnEvent(playerID))
+			p.engine.OnSpawn(playerID)
 		}
 	}
 
 	vcmp.Events.OnPlayerDeath = func(playerID, killerID int, _ int, _ vcmp.BodyPart) {
-		p.engine.Enqueue(safari.NewDeathEvent(playerID, killerID))
+		p.engine.OnDeath(playerID, killerID)
 	}
 
 	vcmp.Events.OnPlayerCommand = func(playerID int, command string) vcmp.FilterResult {
@@ -83,77 +80,29 @@ func (p *Plugin) register() {
 	}
 
 	vcmp.Events.OnVehicleExplode = func(vehicleID int) {
-		p.engine.Enqueue(safari.NewVehicleExplodeEvent(vehicleID))
-	}
-
-	vcmp.Events.OnVehicleUpdate = func(vehicleID int, updateType vcmp.VehicleUpdate) {
-		p.engine.Enqueue(safari.NewVehicleUpdateEvent(vehicleID, int(updateType)))
-	}
-
-	vcmp.Events.OnVehicleRespawn = func(vehicleID int) {
-		p.engine.Enqueue(safari.NewVehicleRespawnEvent(vehicleID))
+		p.engine.OnVehicleExplode(vehicleID)
 	}
 
 	vcmp.Events.OnPickupPickAttempt = func(pickupID, playerID int) vcmp.FilterResult {
-		if p.engine.HandlePickupPickAttemptSync(pickupID, playerID) {
+		if p.engine.HandlePickupPickAttempt(pickupID, playerID) {
 			return vcmp.FilterAllow
 		}
 		return vcmp.FilterDeny
 	}
 
 	vcmp.Events.OnPickupPicked = func(pickupID, playerID int) {
-		p.engine.Enqueue(safari.NewPickupPickedEvent(pickupID, playerID))
-	}
-
-	vcmp.Events.OnCheckpointEntered = func(checkpointID, playerID int) {
-		p.engine.Enqueue(safari.NewCheckpointEnteredEvent(checkpointID, playerID))
-	}
-
-	vcmp.Events.OnCheckpointExited = func(checkpointID, playerID int) {
-		p.engine.Enqueue(safari.NewCheckpointExitedEvent(checkpointID, playerID))
+		p.engine.OnPickupPicked(pickupID, playerID)
 	}
 
 	vcmp.Events.OnPlayerKeyBindDown = func(playerID, bindID int) {
-		p.engine.Enqueue(safari.NewKeyBindEvent(playerID, bindID, false))
-	}
-
-	vcmp.Events.OnPlayerKeyBindUp = func(playerID, bindID int) {
-		p.engine.Enqueue(safari.NewKeyBindEvent(playerID, bindID, true))
-	}
-
-	vcmp.Events.OnObjectShot = func(objectID, playerID, weaponID int) {
-		p.engine.Enqueue(safari.NewObjectShotEvent(objectID, playerID, weaponID))
-	}
-
-	vcmp.Events.OnObjectTouched = func(objectID, playerID int) {
-		p.engine.Enqueue(safari.NewObjectTouchedEvent(objectID, playerID))
-	}
-
-	vcmp.Events.OnPickupRespawn = func(pickupID int) {
-		p.engine.Enqueue(safari.NewPickupRespawnEvent(pickupID))
-	}
-
-	vcmp.Events.OnEntityPoolChange = func(entityType vcmp.EntityPool, entityID int, isDeleted bool) {
-		p.engine.Enqueue(safari.NewEntityPoolChangeEvent(int(entityType), entityID, isDeleted))
-	}
-
-	vcmp.Events.OnPlayerUpdate = func(playerID int, updateType vcmp.PlayerUpdate) {
-		p.engine.Enqueue(safari.NewPlayerUpdateEvent(playerID, int(updateType)))
+		p.engine.OnPlayerKeyBind(playerID, bindID, false)
 	}
 
 	vcmp.Events.OnPlayerRequestEnterVehicle = func(playerID, vehicleID, slot int) vcmp.FilterResult {
-		if p.engine.HandleEnterVehicleRequestSync(playerID, vehicleID, slot) {
+		if p.engine.HandleEnterVehicleRequest(playerID, vehicleID, slot) {
 			return vcmp.FilterAllow
 		}
 		return vcmp.FilterDeny
-	}
-
-	vcmp.Events.OnPlayerEnterVehicle = func(playerID, vehicleID, slot int) {
-		p.engine.Enqueue(safari.NewPlayerEnterVehicleEvent(playerID, vehicleID, slot))
-	}
-
-	vcmp.Events.OnPlayerExitVehicle = func(playerID, vehicleID int) {
-		p.engine.Enqueue(safari.NewPlayerExitVehicleEvent(playerID, vehicleID))
 	}
 
 	vcmp.Events.OnIncomingConnection = func(name, password, ip string) string {
@@ -161,51 +110,7 @@ func (p *Plugin) register() {
 		return name
 	}
 
-	vcmp.Events.OnPlayerNameChange = func(playerID int, oldName, newName string) {
-		_, _, _ = playerID, oldName, newName
-	}
-
-	vcmp.Events.OnPlayerActionChange = func(playerID, oldAction, newAction int) {
-		_, _, _ = playerID, oldAction, newAction
-	}
-
-	vcmp.Events.OnPlayerOnFireChange = func(playerID int, isOnFire bool) {
-		_, _ = playerID, isOnFire
-	}
-
-	vcmp.Events.OnPlayerCrouchChange = func(playerID int, isCrouching bool) {
-		_, _ = playerID, isCrouching
-	}
-
-	vcmp.Events.OnPlayerGameKeysChange = func(playerID int, oldKeys, newKeys uint32) {
-		_, _, _ = playerID, oldKeys, newKeys
-	}
-
-	vcmp.Events.OnPlayerBeginTyping = func(playerID int) { _ = playerID }
-	vcmp.Events.OnPlayerEndTyping = func(playerID int)   { _ = playerID }
-	vcmp.Events.OnPlayerAwayChange = func(playerID int, isAway bool) {
-		_, _ = playerID, isAway
-	}
-
-	vcmp.Events.OnPlayerPrivateMessage = func(playerID, targetPlayerID int, message string) vcmp.FilterResult {
-		_, _, _ = playerID, targetPlayerID, message
-		return vcmp.FilterAllow
-	}
-
-	vcmp.Events.OnPlayerSpectate = func(playerID, targetPlayerID int) {
-		_, _ = playerID, targetPlayerID
-	}
-
 	vcmp.Events.OnPlayerCrashReport = func(playerID int, report string) {
 		vcmp.API.Server.Log(fmt.Sprintf("[safari] crash report from %d: %s", playerID, report))
-	}
-
-	vcmp.Events.OnPluginCommand = func(commandID uint32, message string) vcmp.FilterResult {
-		_, _ = commandID, message
-		return vcmp.FilterAllow
-	}
-
-	vcmp.Events.OnServerPerformanceReport = func(descriptions []string, times []uint64) {
-		_, _ = descriptions, times
 	}
 }

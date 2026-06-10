@@ -38,7 +38,6 @@ func newPlugin(cfg Config) *Plugin {
 	}
 
 	engine := safari.NewEngine(safari.VCMPAPI{}, db, safariCfg, mapCfg, cfg.ServerName, gameMode)
-	engine.Start()
 
 	vcmp.API.Server.Log(fmt.Sprintf("[safari] gamemode initialized (map=%s db=%s)", safariCfg.MapFile, safariCfg.DBPath))
 
@@ -46,9 +45,6 @@ func newPlugin(cfg Config) *Plugin {
 }
 
 func (p *Plugin) shutdown() {
-	if p.engine != nil {
-		p.engine.Stop()
-	}
 	if p.db != nil {
 		p.db.Stop()
 	}
