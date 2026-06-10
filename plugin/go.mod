@@ -1,4 +1,4 @@
-module github.com/masteroz/vcmp-go-plugin/examples/safari
+module github.com/masteroz/vcmp-go-plugin/plugin
 
 go 1.25.0
 
@@ -21,6 +21,6 @@ require (
 )
 
 replace (
-	github.com/masteroz/vcmp-go-plugin => ../..
-	github.com/masteroz/vcmp-go-server => ../../../vcmp-go-server
+	github.com/masteroz/vcmp-go-plugin => ..
+	github.com/masteroz/vcmp-go-server => ../../vcmp-go-server
 )

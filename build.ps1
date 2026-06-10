@@ -1,40 +1,24 @@
 param(
-    [ValidateSet("blank", "safari")]
-    [string]$Example = "blank",
     [ValidateSet("native", "linux", "windows")]
     [string]$Target = "windows",
-    [switch]$All,
-    [switch]$Deps,
-    [switch]$Clean,
-    [switch]$DeployToServer,
+    [string]$ServerRoot = "",
+    [switch]$NoDeploy,
     [switch]$StopServer,
     [switch]$StartServer,
     [switch]$Test,
-    [switch]$Full
+    [switch]$Deps,
+    [switch]$Clean
 )
 
 $ErrorActionPreference = "Stop"
 $Root = $PSScriptRoot
 $PluginDir = Join-Path $Root "plugins"
+$PluginSrc = Join-Path $Root "plugin"
 $Header = Join-Path $Root "include\plugin.h"
-$ServerRoot = Join-Path (Split-Path $Root -Parent) "vcmp-go-server"
+$PluginName = "goserver04rel64"
 
-$PluginNames = @{
-    blank  = "goplugin04rel64"
-    safari = "goserver04rel64"
-}
-
-# Safari dev workflow: test library, stop server, build, deploy.
-if ($Full) {
-    $Example = "safari"
-    $Target = "windows"
-    $DeployToServer = $true
-    $StopServer = $true
-    $Test = $true
-}
-
-if ($Example -eq "safari" -and (Test-Path $ServerRoot) -and -not $DeployToServer -and -not $Clean -and -not $Deps -and -not $All) {
-    $DeployToServer = $true
+if (-not $ServerRoot) {
+    $ServerRoot = Join-Path (Split-Path $Root -Parent) "vcmp-go-server"
 }
 
 function Ensure-Deps {
@@ -94,21 +78,13 @@ function Invoke-ServerTests {
 }
 
 function Invoke-Build {
-    param(
-        [string]$Ex,
-        [string]$OsTarget
-    )
+    param([string]$OsTarget)
 
     Ensure-Deps
     New-Item -ItemType Directory -Force -Path $PluginDir | Out-Null
 
-    $name = $PluginNames[$Ex]
-    $exampleDir = Join-Path $Root "examples\$Ex"
-
-    if ($Ex -eq "safari") {
-        Push-Location $exampleDir
-        try { go mod tidy } finally { Pop-Location }
-    }
+    Push-Location $PluginSrc
+    try { go mod tidy } finally { Pop-Location }
 
     $env:CGO_ENABLED = "1"
     $env:GOOS = $null
@@ -119,25 +95,25 @@ function Invoke-Build {
         "linux" {
             $env:GOOS = "linux"
             $env:GOARCH = "amd64"
-            $out = Join-Path $PluginDir "$name.so"
+            $out = Join-Path $PluginDir "$PluginName.so"
         }
         "windows" {
             $env:GOOS = "windows"
             $env:GOARCH = "amd64"
             $env:CC = "x86_64-w64-mingw32-gcc"
-            $out = Join-Path $PluginDir "$name.dll"
+            $out = Join-Path $PluginDir "$PluginName.dll"
         }
         default {
             if ($IsWindows -or $env:OS -match "Windows") {
-                $out = Join-Path $PluginDir "$name.dll"
+                $out = Join-Path $PluginDir "$PluginName.dll"
             } else {
-                $out = Join-Path $PluginDir "$name.so"
+                $out = Join-Path $PluginDir "$PluginName.so"
             }
         }
     }
 
-    Write-Host "Building $Ex -> $out"
-    Push-Location $exampleDir
+    Write-Host "Building Safari plugin -> $out"
+    Push-Location $PluginSrc
     try {
         go build -buildmode=c-shared -o $out .
         if ($LASTEXITCODE -ne 0) { throw "go build failed" }
@@ -177,11 +153,8 @@ function Deploy-PluginToServer {
 
 if ($Clean) {
     Remove-Item -Force -ErrorAction SilentlyContinue `
-        (Join-Path $PluginDir "goplugin04rel64.so"),
-        (Join-Path $PluginDir "goplugin04rel64.dll"),
         (Join-Path $PluginDir "goserver04rel64.so"),
         (Join-Path $PluginDir "goserver04rel64.dll"),
-        (Join-Path $Root "goplugin04rel64.h"),
         (Join-Path $Root "goserver04rel64.h")
     Write-Host "Cleaned plugin outputs"
     exit 0
@@ -201,18 +174,13 @@ if ($Test) {
     Invoke-ServerTests
 }
 
-if ($All) {
-    $blankOut = Invoke-Build -Ex "blank" -OsTarget $Target
-    $safariOut = Invoke-Build -Ex "safari" -OsTarget $Target
-    if ($DeployToServer -and $safariOut) { Deploy-PluginToServer $safariOut }
-    if ($StartServer) { Start-VcmpServer }
-    exit 0
-}
+$out = Invoke-Build -OsTarget $Target
 
-$out = Invoke-Build -Ex $Example -OsTarget $Target
-if ($DeployToServer -and $out) {
+$deploy = -not $NoDeploy
+if ($deploy -and $out) {
     Deploy-PluginToServer $out
 }
+
 if ($StartServer) {
     Start-VcmpServer
 }
