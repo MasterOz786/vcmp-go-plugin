@@ -18,7 +18,7 @@ func (p *Plugin) register() {
 		_ = vcmp.API.KeyBind.Register(1, false, 0x31, 0, 0) // "1" -> pack 1
 		_ = vcmp.API.KeyBind.Register(2, false, 0x32, 0, 0) // "2" -> pack 2
 		_ = vcmp.API.KeyBind.Register(3, false, 0x33, 0, 0) // "3" -> pack 3
-		_ = vcmp.API.KeyBind.Register(4, false, 0x48, 0, 0) // "H" -> hydra camera cycle
+		// H is client-side only (store/script/HydraCamera.nut) — server keybind would double-cycle.
 		return vcmp.FilterAllow
 	}
 
