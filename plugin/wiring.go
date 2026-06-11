@@ -7,6 +7,7 @@ import (
 	"github.com/masteroz/vcmp-go-plugin/vcmp"
 )
 
+// register wires vcmp.Events directly to safari.Engine (no event queue).
 func (p *Plugin) register() {
 	if p.engine == nil {
 		return
@@ -66,7 +67,7 @@ func (p *Plugin) register() {
 	}
 
 	vcmp.Events.OnPlayerCommand = func(playerID int, command string) vcmp.FilterResult {
-		if p.engine.HandleCommandSync(playerID, command) {
+		if res := p.engine.HandleCommand(playerID, command); res.Deny {
 			return vcmp.FilterDeny
 		}
 		return vcmp.FilterAllow
@@ -74,7 +75,7 @@ func (p *Plugin) register() {
 
 	vcmp.Events.OnPlayerMessage = func(playerID int, message string) vcmp.FilterResult {
 		if strings.HasPrefix(strings.TrimSpace(message), "/") {
-			if p.engine.HandleCommandSync(playerID, message) {
+			if res := p.engine.HandleCommand(playerID, message); res.Deny {
 				return vcmp.FilterDeny
 			}
 		}
@@ -125,8 +126,6 @@ func (p *Plugin) register() {
 	}
 
 	vcmp.Events.OnClientScriptData = func(playerID int, data []byte) {
-		if p.engine != nil {
-			p.engine.HandleClientScriptData(playerID, data)
-		}
+		p.engine.HandleClientScriptData(playerID, data)
 	}
 }
