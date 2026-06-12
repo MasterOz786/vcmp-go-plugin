@@ -5,12 +5,13 @@ import (
 
 	"github.com/masteroz/vcmp-go-plugin/vcmp"
 	"github.com/masteroz/vcmp-go-server/safari"
+	"github.com/masteroz/vcmp-go-server/safari/persist"
 )
 
 type Plugin struct {
 	engine *safari.Engine
-	store  *safari.Store
-	db     *safari.DBWorker
+	store  *persist.Store
+	db     *persist.DBWorker
 }
 
 var plug *Plugin
@@ -23,13 +24,13 @@ func newPlugin(cfg Config) *Plugin {
 		mapCfg = defaultSafariMap()
 	}
 
-	store, err := safari.OpenStore(safariCfg.DBPath)
+	store, err := persist.OpenStore(safariCfg.DBPath)
 	if err != nil {
 		vcmp.API.Server.Log(fmt.Sprintf("[safari] database open failed: %v", err))
 		return &Plugin{}
 	}
 
-	db := safari.NewDBWorker(store, 128)
+	db := persist.NewDBWorker(store, 128)
 	db.Start()
 
 	gameMode := cfg.GameModeText

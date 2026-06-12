@@ -70,8 +70,9 @@ const (
 	PlayerOptionShowMarkers      PlayerOption = PlayerOption(C.vcmpPlayerOptionShowMarkers)
 	PlayerOptionCanAttack        PlayerOption = PlayerOption(C.vcmpPlayerOptionCanAttack)
 	PlayerOptionHasMarker        PlayerOption = PlayerOption(C.vcmpPlayerOptionHasMarker)
-	PlayerOptionChatTagsEnabled PlayerOption = PlayerOption(C.vcmpPlayerOptionChatTagsEnabled)
-	PlayerOptionDrunkEffects    PlayerOption = PlayerOption(C.vcmpPlayerOptionDrunkEffects)
+	PlayerOptionChatTagsEnabled        PlayerOption = PlayerOption(C.vcmpPlayerOptionChatTagsEnabled)
+	PlayerOptionDrunkEffectsDeprecated PlayerOption = PlayerOption(C.vcmpPlayerOptionDrunkEffectsDeprecated)
+	PlayerOptionBleeding               PlayerOption = PlayerOption(C.vcmpPlayerOptionBleeding)
 )
 
 type VehicleOption int
