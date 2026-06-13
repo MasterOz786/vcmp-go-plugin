@@ -71,7 +71,6 @@ const (
 	PlayerOptionCanAttack        PlayerOption = PlayerOption(C.vcmpPlayerOptionCanAttack)
 	PlayerOptionHasMarker        PlayerOption = PlayerOption(C.vcmpPlayerOptionHasMarker)
 	PlayerOptionChatTagsEnabled PlayerOption = PlayerOption(C.vcmpPlayerOptionChatTagsEnabled)
-	PlayerOptionDrunkEffects    PlayerOption = PlayerOption(C.vcmpPlayerOptionDrunkEffects)
 	PlayerOptionBleeding        PlayerOption = PlayerOption(C.vcmpPlayerOptionBleeding)
 )
 
